@@ -1,0 +1,34 @@
+{
+    "name": "harmonicdigital/ccsds",
+    "description": "An SDK for parsing CCSDS files.",
+    "type": "library",
+    "config": {
+        "sort-packages": true
+    },
+    "require-dev": {
+        "vimeo/psalm": "^6.16",
+        "friendsofphp/php-cs-fixer": "^3.94",
+        "phpunit/phpunit": "^13.0"
+    },
+    "license": "MIT",
+    "autoload": {
+        "psr-4": {
+            "Harmonicdigital\\Ccsds\\": "src/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "Harmonicdigital\\Ccsds\\Tests\\": "tests/"
+        }
+    },
+    "authors": [
+        {
+            "name": "Rick Ogden",
+            "email": "rick@harmonicdigital.uk"
+        }
+    ],
+    "require": {
+        "php": "^8.4",
+        "league/flysystem": "^3.33"
+    }
+}
