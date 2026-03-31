@@ -2,12 +2,15 @@
 
 declare(strict_types=1);
 
-namespace Harmonicdigital\Ccsds\Tests\Parser;
+namespace HarmonicDigital\Ccsds\Tests\Parser;
 
-use Harmonicdigital\Ccsds\Exception\ParseException;
-use Harmonicdigital\Ccsds\Oem\OemFile;
-use Harmonicdigital\Ccsds\Oem\OemSegment;
-use Harmonicdigital\Ccsds\Parser\OemParser;
+use HarmonicDigital\Ccsds\Exception\ParseException;
+use HarmonicDigital\Ccsds\Oem\Header;
+use HarmonicDigital\Ccsds\Oem\Metadata;
+use HarmonicDigital\Ccsds\Oem\OemFile;
+use HarmonicDigital\Ccsds\Oem\OemSegment;
+use HarmonicDigital\Ccsds\Oem\StateVector;
+use HarmonicDigital\Ccsds\Parser\OemParser;
 use League\Flysystem\Filesystem;
 use League\Flysystem\FilesystemOperator;
 use League\Flysystem\Local\LocalFilesystemAdapter;
@@ -16,6 +19,11 @@ use PHPUnit\Framework\TestCase;
 
 #[CoversClass(OemParser::class)]
 #[CoversClass(OemFile::class)]
+#[CoversClass(OemSegment::class)]
+#[CoversClass(Header::class)]
+#[CoversClass(ParseException::class)]
+#[CoversClass(Metadata::class)]
+#[CoversClass(StateVector::class)]
 final class OemParserTest extends TestCase
 {
     private OemParser $parser;
@@ -66,7 +74,7 @@ final class OemParserTest extends TestCase
     {
         $file = $this->parser->parseFromStream($this->resource);
 
-        $segments = iterator_to_array($file->segments());
+        $segments = iterator_to_array($file);
         $this->assertCount(2045, $segments);
     }
 
@@ -112,7 +120,7 @@ final class OemParserTest extends TestCase
         $file = $this->parser->parseFromStream($this->resource);
 
         $lastSegment = null;
-        foreach ($file->segments() as $segment) {
+        foreach ($file as $segment) {
             $lastSegment = $segment;
         }
         $this->assertNotNull($lastSegment);
@@ -131,7 +139,7 @@ final class OemParserTest extends TestCase
         $this->expectExceptionMessageMatches('/Missing required header fields/');
 
         $tmpPath = tempnam(sys_get_temp_dir(), 'oem_test_');
-        if ($tmpPath === false) {
+        if (false === $tmpPath) {
             self::fail('Could not create temporary file');
         }
 
@@ -149,8 +157,8 @@ final class OemParserTest extends TestCase
     {
         $file = $this->parser->parseFromStream($this->resource);
 
-        $first = iterator_to_array($file->segments());
-        $second = iterator_to_array($file->segments());
+        $first = iterator_to_array($file);
+        $second = iterator_to_array($file);
 
         $this->assertCount(2045, $first);
         $this->assertSame($first[0], $second[0]);
@@ -165,16 +173,16 @@ final class OemParserTest extends TestCase
             break; // abandon after first segment
         }
 
-        $segments = iterator_to_array($file->segments());
+        $segments = iterator_to_array($file);
         $this->assertCount(2045, $segments);
         $this->assertSame('2009-05-14T13:39:04.723000', $segments[0]->metadata->startTime->format('Y-m-d\TH:i:s.u'));
     }
 
     private function firstSegment(OemFile $file): OemSegment
     {
-        foreach ($file->segments() as $segment) {
+        foreach ($file as $segment) {
             return $segment;
         }
-        self::fail('No segments found');
+        $this->fail('No segments found');
     }
 }

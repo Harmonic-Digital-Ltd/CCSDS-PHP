@@ -2,10 +2,11 @@
 
 declare(strict_types=1);
 
-namespace Harmonicdigital\Ccsds\Oem;
+namespace HarmonicDigital\Ccsds\Oem;
 
 /**
  * @api
+ *
  * @implements \IteratorAggregate<int, OemSegment>
  */
 final readonly class OemFile implements \IteratorAggregate
@@ -21,20 +22,6 @@ final readonly class OemFile implements \IteratorAggregate
     ) {}
 
     /**
-     * Returns this file as an iterable over its segments.
-     * Segments are cached after the first pass; subsequent iterations replay from cache.
-     *
-     * @return static
-     */
-    public function segments(): static
-    {
-        return $this;
-    }
-
-    /**
-     * Each call returns a fresh generator that replays the cache then streams the rest.
-     * This means the file can be iterated multiple times without re-reading the source.
-     *
      * @return \Traversable<int, OemSegment>
      */
     #[\Override]

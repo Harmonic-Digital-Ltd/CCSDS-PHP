@@ -2,20 +2,22 @@
 
 declare(strict_types=1);
 
-namespace Harmonicdigital\Ccsds;
+namespace HarmonicDigital\Ccsds;
 
-use Harmonicdigital\Ccsds\Oem\OemFile;
-use Harmonicdigital\Ccsds\Parser\OemParser;
+use HarmonicDigital\Ccsds\Oem\OemFile;
+use HarmonicDigital\Ccsds\Parser\OemParser;
+use HarmonicDigital\Ccsds\Parser\OemParserInterface;
 use League\Flysystem\FilesystemReader;
 
 /** @api */
-final readonly class Client
+final readonly class CcsdsClient implements CcsdsClientInterface
 {
     public function __construct(
         private FilesystemReader $fs,
-        private OemParser $oemParser = new OemParser(),
+        private OemParserInterface $oemParser = new OemParser(),
     ) {}
 
+    #[\Override]
     public function parseOemFile(string $location): OemFile
     {
         return $this->oemParser->parseFromStream($this->fs->readStream($location));

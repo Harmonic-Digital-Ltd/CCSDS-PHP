@@ -6,19 +6,20 @@
         "sort-packages": true
     },
     "require-dev": {
-        "vimeo/psalm": "^6.16",
         "friendsofphp/php-cs-fixer": "^3.94",
-        "phpunit/phpunit": "^13.0"
+        "phpunit/phpunit": "^13.0",
+        "symfony/stopwatch": "^8.0",
+        "vimeo/psalm": "^6.16"
     },
     "license": "MIT",
     "autoload": {
         "psr-4": {
-            "Harmonicdigital\\Ccsds\\": "src/"
+            "HarmonicDigital\\Ccsds\\": "src/"
         }
     },
     "autoload-dev": {
         "psr-4": {
-            "Harmonicdigital\\Ccsds\\Tests\\": "tests/"
+            "HarmonicDigital\\Ccsds\\Tests\\": "tests/"
         }
     },
     "authors": [

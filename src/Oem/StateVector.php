@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Harmonicdigital\Ccsds\Oem;
+namespace HarmonicDigital\Ccsds\Oem;
 
 /**
  * Position in km, velocity in km/s. Stored as numeric strings to preserve exact decimal precision.

@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Harmonicdigital\Ccsds\Oem;
+namespace HarmonicDigital\Ccsds\Oem;
 
 /** @api */
 final readonly class Header

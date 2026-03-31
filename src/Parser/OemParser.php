@@ -2,25 +2,25 @@
 
 declare(strict_types=1);
 
-namespace Harmonicdigital\Ccsds\Parser;
+namespace HarmonicDigital\Ccsds\Parser;
 
-use Harmonicdigital\Ccsds\Exception\ParseException;
-use Harmonicdigital\Ccsds\Iterator\CachedIterator;
-use Harmonicdigital\Ccsds\Oem\Header;
-use Harmonicdigital\Ccsds\Oem\Metadata;
-use Harmonicdigital\Ccsds\Oem\OemFile;
-use Harmonicdigital\Ccsds\Oem\OemSegment;
-use Harmonicdigital\Ccsds\Oem\StateVector;
-use League\Flysystem\FilesystemException;
+use HarmonicDigital\Ccsds\Exception\ParseException;
+use HarmonicDigital\Ccsds\Iterator\CachedIterator;
+use HarmonicDigital\Ccsds\Oem\Header;
+use HarmonicDigital\Ccsds\Oem\Metadata;
+use HarmonicDigital\Ccsds\Oem\OemFile;
+use HarmonicDigital\Ccsds\Oem\OemSegment;
+use HarmonicDigital\Ccsds\Oem\StateVector;
 
 /** @api */
-final class OemParser
+final class OemParser implements OemParserInterface
 {
     /**
      * @param resource $stream
-     * @throws \Throwable
-     * @throws FilesystemException
+     *
+     * @throws ParseException
      */
+    #[\Override]
     public function parseFromStream($stream): OemFile
     {
         try {
@@ -35,6 +35,9 @@ final class OemParser
 
     /**
      * @param resource $stream
+     *
+     * @throws ParseException
+     *
      * @return array{Header, string[], string|null}
      */
     private function readHeader($stream): array
@@ -50,11 +53,11 @@ final class OemParser
             $lineNumber++;
             $trimmed = trim($line);
 
-            if ($trimmed === '') {
+            if ('' === $trimmed) {
                 continue;
             }
 
-            if ($trimmed === 'META_START') {
+            if ('META_START' === $trimmed) {
                 $pendingLine = $trimmed;
                 break;
             }
@@ -73,7 +76,7 @@ final class OemParser
             }
         }
 
-        if ($version === null || $creationDate === null || $originator === null) {
+        if (null === $version || null === $creationDate || null === $originator) {
             throw new ParseException('Missing required header fields: CCSDS_OEM_VERS, CREATION_DATE, ORIGINATOR');
         }
 
@@ -95,7 +98,7 @@ final class OemParser
         $lineNumber = 0;
 
         try {
-            if ($pendingLine === 'META_START') {
+            if ('META_START' === $pendingLine) {
                 $inMeta = true;
                 $metaFields = [];
                 $currentStateVectors = [];
@@ -105,19 +108,19 @@ final class OemParser
                 $lineNumber++;
                 $trimmed = trim($line);
 
-                if ($trimmed === '') {
+                if ('' === $trimmed) {
                     continue;
                 }
 
                 if ($inCovariance) {
-                    if ($trimmed === 'COVARIANCE_STOP') {
+                    if ('COVARIANCE_STOP' === $trimmed) {
                         $inCovariance = false;
                     }
                     continue;
                 }
 
                 if ($inMeta) {
-                    if ($trimmed === 'META_STOP') {
+                    if ('META_STOP' === $trimmed) {
                         $currentMetadata = $this->buildMetadata($metaFields, $lineNumber);
                         $inMeta = false;
                     } else {
@@ -127,8 +130,8 @@ final class OemParser
                     continue;
                 }
 
-                if ($trimmed === 'META_START') {
-                    if ($currentMetadata !== null && $currentStateVectors !== []) {
+                if ('META_START' === $trimmed) {
+                    if (null !== $currentMetadata && [] !== $currentStateVectors) {
                         yield new OemSegment($currentMetadata, $currentStateVectors);
                     }
                     $currentMetadata = null;
@@ -138,7 +141,7 @@ final class OemParser
                     continue;
                 }
 
-                if ($trimmed === 'COVARIANCE_START') {
+                if ('COVARIANCE_START' === $trimmed) {
                     $inCovariance = true;
                     continue;
                 }
@@ -147,12 +150,12 @@ final class OemParser
                     continue;
                 }
 
-                if ($currentMetadata !== null) {
+                if (null !== $currentMetadata) {
                     $currentStateVectors[] = $this->parseStateVector($trimmed, $lineNumber);
                 }
             }
 
-            if ($currentMetadata !== null && $currentStateVectors !== []) {
+            if (null !== $currentMetadata && [] !== $currentStateVectors) {
                 yield new OemSegment($currentMetadata, $currentStateVectors);
             }
         } finally {
@@ -164,7 +167,7 @@ final class OemParser
     private function parseKeyValue(string $line, int $lineNumber): array
     {
         $parts = explode('=', $line, 2);
-        if (count($parts) !== 2) {
+        if (2 !== count($parts)) {
             throw new ParseException(sprintf('Expected key=value on line %d: %s', $lineNumber, $line));
         }
 
@@ -222,7 +225,7 @@ final class OemParser
 
     private function parseDateTimeOrNull(?string $value, int $lineNumber): ?\DateTimeImmutable
     {
-        if ($value === null) {
+        if (null === $value) {
             return null;
         }
 
