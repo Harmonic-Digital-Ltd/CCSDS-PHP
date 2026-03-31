@@ -17,7 +17,7 @@ composer require harmonicdigital/ccsds
 
 ### Parsing an OEM file
 
-`CcsdsClient` accepts any [Flysystem](https://flysystem.thephpleague.com/) `FilesystemReader`, giving you flexibility over where your files are stored — local disk, S3, SFTP, in-memory, etc.
+`CcsdsClient` accepts any [Flysystem](https://flysystem.thephpleague.com/) `FilesystemReader`, giving you flexibility over where your files are stored - local disk, S3, SFTP, in-memory, etc.
 
 ```php
 use HarmonicDigital\Ccsds\CcsdsClient;
@@ -43,7 +43,7 @@ foreach ($oemFile->comments as $comment) {
     echo $comment . PHP_EOL;
 }
 
-// Segments — each covers a contiguous time range
+// Segments - each covers a contiguous time range
 foreach ($oemFile as $segment) {
     $meta = $segment->metadata;
 
@@ -54,7 +54,7 @@ foreach ($oemFile as $segment) {
     echo $meta->startTime->format('Y-m-d\TH:i:s.u');
     echo $meta->stopTime->format('Y-m-d\TH:i:s.u');
 
-    // State vectors — position in km, velocity in km/s
+    // State vectors - position in km, velocity in km/s
     foreach ($segment->stateVectors as $sv) {
         echo $sv->epoch->format('Y-m-d\TH:i:s.u');
         echo "  x={$sv->x}  y={$sv->y}  z={$sv->z}";
@@ -70,7 +70,7 @@ The parser reads the file header eagerly, then yields segments lazily via a `Cac
 
 - Accessing `$oemFile->header` and `$oemFile->comments` never triggers segment loading.
 - Segments are parsed on demand as you iterate.
-- Subsequent iterations replay from the cache — the underlying stream is only read once.
+- Subsequent iterations replay from the cache - the underlying stream is only read once.
 
 ```php
 // Safe to iterate multiple times at no extra I/O cost
@@ -126,4 +126,4 @@ composer install
 
 ## License
 
-MIT-NON-AI — see [LICENSE](LICENSE).
+MIT-NON-AI - see [LICENSE](LICENSE).
